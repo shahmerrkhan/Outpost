@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
 import SidebarSpacer from "./components/SidebarSpacer";
+import { SidebarVisibleProvider } from "./components/SidebarContext";
 
 
 const geistSans = Geist({
@@ -30,8 +31,10 @@ export default function RootLayout({
      <ClerkProvider appearance={{ elements: { userButtonPopoverActionButton__manageAccount: "hidden" } }}>
       <html lang="en">
         <body>
-          <Sidebar />
-          <SidebarSpacer>{children}</SidebarSpacer>
+          <SidebarVisibleProvider>
+            <Sidebar />
+            <SidebarSpacer>{children}</SidebarSpacer>
+          </SidebarVisibleProvider>
         </body>
       </html>
     </ClerkProvider>

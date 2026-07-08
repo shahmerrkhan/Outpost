@@ -9,8 +9,8 @@ import { checkRateLimit, standardRateLimit } from "@/app/lib/ratelimit";
 import { z } from "zod";
 
 const addContactSchema = z.object({
-  name: z.string().trim().min(1).max(200),
-  email: z.string().trim().max(200).email().optional().or(z.literal("")),
+  name: z.string().trim().min(1).max(200).regex(/^[a-zA-Z\s.'-]+$/, "Name cannot contain numbers or symbols"),
+  email: z.string().trim().max(200).email("Must be a valid email").optional().or(z.literal("")),
   company: z.string().trim().max(200).optional().or(z.literal("")),
 });
 
@@ -77,10 +77,10 @@ export async function addContact(teamId: string, name: string, email: string, co
   const existing = await db
     .select()
     .from(contacts)
-    .where(and(eq(contacts.teamId, teamId), eq(contacts.name, name), eq(contacts.company, company)));
+    .where(and(eq(contacts.teamId, teamId), eq(contacts.name, name)));
 
   if (existing.length > 0) {
-    throw new Error("This contact already exists for this team.");
+    throw new Error("A contact with this name already exists for this team.");
   }
 
   const [contact] = await db

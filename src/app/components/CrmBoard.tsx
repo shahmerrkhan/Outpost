@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -45,7 +45,7 @@ function DraggableCard({ contact }: { contact: Contact }) {
       style={style}
       {...listeners}
       {...attributes}
-      className="bg-[#14141c] border border-[#26262f] rounded-lg p-3 cursor-grab active:cursor-grabbing transition-shadow duration-150 hover:-translate-y-0.5 hover:border-[#3a3a45] hover:shadow-md hover:shadow-black/30 touch-none"
+      className="bg-[#14141c] border border-[#26262f] rounded-lg p-3 cursor-grab active:cursor-grabbing hover:border-[#3a3a45] touch-none"
     >
       <p className="text-sm font-medium text-white">{contact.name}</p>
       <p className="text-xs text-gray-500">{contact.company}</p>
@@ -83,6 +83,10 @@ function DroppableColumn({ col, items }: { col: (typeof COLUMNS)[number]; items:
 export default function CrmBoard({ teamId, contacts }: { teamId: string; contacts: Contact[] }) {
   const [localContacts, setLocalContacts] = useState(contacts);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLocalContacts(contacts);
+  }, [contacts]);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   function handleDragStart(e: DragStartEvent) {

@@ -10,6 +10,7 @@ import Image from "next/image";
 import { LayoutDashboard, Users, Briefcase, Trophy, Bell, Plus, Radio, BarChart3, Sparkles } from "lucide-react";
 import LogActivityModal from "./LogActivityModal";
 import TeamContextPicker from "./TeamContextPicker";
+import { useSidebarVisible } from "./SidebarContext";
 
 type SidebarTeam = { id: string; name: string; description: string | null };
 
@@ -27,6 +28,7 @@ const links = [
 export default function Sidebar() {
   const { isSignedIn, isLoaded, user } = useUser();
   const pathname = usePathname();
+  const { visible, setVisible } = useSidebarVisible();
   const [count, setCount] = useState(0);
   const [teamId, setTeamId] = useState<string | null>(null);
   const [hasTeam, setHasTeam] = useState<boolean | null>(null);
@@ -74,11 +76,19 @@ export default function Sidebar() {
     }).catch(() => setReady(true));
   }, [pathname]);
 
-  if (!isLoaded || !isSignedIn) return null;
-  if (pathname === "/onboarding") return null;
-  if (pathname === "/") return null;
-  if (pathname === "/launch") return null;
-  if (pathname === "/teams") return null;
+  const shouldShow =
+    isLoaded &&
+    isSignedIn &&
+    pathname !== "/onboarding" &&
+    pathname !== "/" &&
+    pathname !== "/launch" &&
+    hasTeam === true;
+
+  useEffect(() => {
+    setVisible(shouldShow);
+  }, [shouldShow]);
+
+  if (!shouldShow) return null;
 
   return (
     <>
@@ -139,7 +149,7 @@ export default function Sidebar() {
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
-          {(hasTeam === false ? links.filter((l) => l.href === "/teams") : links).map(({ href, label, icon: Icon }) => {
+          {links.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
