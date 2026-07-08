@@ -74,12 +74,11 @@ export async function addContact(teamId: string, name: string, email: string, co
   email = parsed.email ?? "";
   company = parsed.company ?? "";
 
-  const existing = await db
-    .select()
-    .from(contacts)
-    .where(and(eq(contacts.teamId, teamId), eq(contacts.name, name)));
+  const allTeamContacts = await db.select().from(contacts).where(eq(contacts.teamId, teamId));
+  const normalizedName = name.trim().toLowerCase();
+  const isDupe = allTeamContacts.some((c) => c.name.trim().toLowerCase() === normalizedName);
 
-  if (existing.length > 0) {
+  if (isDupe) {
     throw new Error("A contact with this name already exists for this team.");
   }
 

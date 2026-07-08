@@ -7,13 +7,14 @@ import { Megaphone, Pin } from "lucide-react";
 
 export default function AnnouncementsCard({
   teamId,
-  announcements,
+  announcements: initialAnnouncements,
   isFounder,
 }: {
   teamId: string;
   announcements: any[];
   isFounder: boolean;
 }) {
+  const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
 
@@ -23,13 +24,13 @@ export default function AnnouncementsCard({
     if (!text.trim()) return;
     setPosting(true);
     try {
-      await postAnnouncement(teamId, text, true);
+      const newAnnouncement = await postAnnouncement(teamId, text, true);
+      setAnnouncements((prev) => [...prev, newAnnouncement]);
       setText("");
-      window.location.reload();
     } catch (e) {
       alert(toActionError(e).message);
-      setPosting(false);
     }
+    setPosting(false);
   }
 
   return (

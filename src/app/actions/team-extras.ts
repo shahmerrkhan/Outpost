@@ -54,7 +54,7 @@ export async function postAnnouncement(teamId: string, content: string, pinned: 
   const parsed = announcementSchema.parse({ content });
   content = parsed.content;
 
-  await db.insert(announcements).values({ teamId, authorId: dbUser.id, content, pinned });
+  const [newAnnouncement] = await db.insert(announcements).values({ teamId, authorId: dbUser.id, content, pinned }).returning();
 
   const members = await db
     .select({ email: users.email })
@@ -69,6 +69,7 @@ export async function postAnnouncement(teamId: string, content: string, pinned: 
   }
 
   revalidatePath("/dashboard");
+  return newAnnouncement;
 }
 
 export async function togglePin(announcementId: string, teamId: string, pinned: boolean) {
