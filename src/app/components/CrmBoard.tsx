@@ -32,7 +32,7 @@ export default function CrmBoard({ contacts }: { contacts: Contact[] }) {
   }
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-4">
       {COLUMNS.map((col) => {
         const items = localContacts.filter((c) => c.status === col.key);
         return (
@@ -41,7 +41,7 @@ export default function CrmBoard({ contacts }: { contacts: Contact[] }) {
               <h3 className="text-sm font-medium text-gray-300">{col.label}</h3>
               <span className="text-xs text-gray-500 bg-[#1a1a24] px-2 py-0.5 rounded-full">{items.length}</span>
             </div>
-            <div className={`space-y-2 border-t-2 ${col.color} pt-3`}>
+            <div className={`space-y-2 border-t-2 ${col.color} pt-3 overflow-visible`}>
               {items.map((c) => (
                 <div key={c.id} className="bg-[#14141c] border border-[#26262f] rounded-lg p-3 transition-all duration-250 ease-out hover:-translate-y-0.5 hover:border-[#3a3a45] hover:shadow-md hover:shadow-black/30">
                   <p className="text-sm font-medium text-white">{c.name}</p>
