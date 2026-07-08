@@ -12,16 +12,7 @@ export default function Page() {
           appearance={{
             variables: {
               colorPrimary: "#dc2626",
-              colorBackground: "#0f0f0f",
-              colorTextSecondary: "#d1d5db",
-              colorInputBackground: "#050505",
-              colorInputText: "#f5f5f5",
-              colorNeutral: "#f5f5f5",
-              borderRadius: "0.75rem",
             },
-          layout: {
-            animations: false,
-          },
             elements: {
               rootBox: "opacity-100",
               card: "bg-[#0f0f0f] border border-white/10 shadow-2xl opacity-100",
