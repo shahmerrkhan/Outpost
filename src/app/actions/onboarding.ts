@@ -7,10 +7,11 @@ import { revalidatePath } from "next/cache";
 import { ensureDbUser } from "@/app/actions/user";
 import { checkRateLimit, standardRateLimit } from "@/app/lib/ratelimit";
 
-export async function saveProfileInfo(school: string) {
+export async function saveProfileInfo(name: string, school: string) {
   const dbUser = await ensureDbUser();
+  if (!name || name.trim().length === 0 || name.length > 200) throw new Error("Invalid name");
   if (school && school.length > 200) throw new Error("School name too long");
-  await db.update(users).set({ school }).where(eq(users.id, dbUser.id));
+  await db.update(users).set({ name: name.trim(), school }).where(eq(users.id, dbUser.id));
 }
 
 export async function completeAsFounder(teamName: string, description: string) {

@@ -98,3 +98,10 @@ body {
   background-color: transparent !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
+
+button, a, [role="button"] {
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+button:active {
+  transform: scale(0.97);
+}

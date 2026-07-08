@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { createTeam, requestToJoin } from "@/app/actions/teams";
 import { setActiveContext, getActiveContext } from "@/app/actions/session-context";
+import TeamsGrid from "@/app/components/TeamsGrid";
 import { ensureDbUser } from "@/app/actions/user";
 import AnimatedButton from "@/app/components/AnimatedButton";
 import PageWrap from "@/app/components/PageWrap";
@@ -36,6 +37,14 @@ export default async function TeamsPage() {
     "use server";
     const teamId = formData.get("teamId") as string;
     await requestToJoin(teamId);
+  }
+
+  async function handleGoToTeam(formData: FormData) {
+    "use server";
+    const teamId = formData.get("teamId") as string;
+    const mode = formData.get("mode") as "founder" | "member";
+    await setActiveContext(teamId, mode);
+    redirect("/dashboard");
   }
 
   return (
@@ -72,49 +81,15 @@ export default async function TeamsPage() {
       </div>
 
       <h2 className="text-white font-semibold mb-4">All Teams</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {allTeams.map((team) => (
-          <div key={team.id} className={`bg-[#14141c] border rounded-xl p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 ${team.id === active.teamId ? "border-yellow-400" : "border-[#26262f] hover:border-[#3a3a45]"}`}>
-            <div className="flex items-start justify-between mb-2">
-              {myTeamIds.has(team.id) ? (
-                <form action={async () => {
-                  "use server";
-                  await setActiveContext(team.id, team.leaderId === dbUser.id ? "founder" : "member");
-                  redirect("/dashboard");
-                }}>
-                  <button type="submit" className="font-semibold text-white hover:text-yellow-400 transition flex items-center gap-2">
-                    <Users size={16} />
-                    {team.name}
-                  </button>
-                </form>
-              ) : (
-                <a href={`/teams/${team.id}`} className="font-semibold text-white hover:text-yellow-400 transition flex items-center gap-2">
-                  <Users size={16} />
-                  {team.name}
-                </a>
-              )}
-            </div>
-            <p className="text-sm text-gray-500 mb-4">{team.description || "No description"}</p>
-            {team.id === active.teamId && (
-              <span className="text-xs bg-yellow-400/10 text-yellow-400 px-2 py-1 rounded-full mr-2">Current</span>
-            )}
-            {team.leaderId === dbUser.id ? (
-              <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded-full">Founder</span>
-            ) : myTeamIds.has(team.id) ? (
-              <span className="text-xs bg-green-500/10 text-green-400 px-2 py-1 rounded-full">Member</span>   
-            ) : pendingTeamIds.has(team.id) ? (
-              <span className="text-xs bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-full">Request Pending</span>
-            ) : (
-              <form action={handleJoin}>
-                <input type="hidden" name="teamId" value={team.id} />
-                <AnimatedButton type="submit" className="bg-[#1a1a24] border border-[#26262f] text-white px-4 py-1.5 rounded-lg text-xs">
-                  Request to Join
-                </AnimatedButton>
-              </form>
-            )}
-          </div>
-        ))}
-      </div>
+      <TeamsGrid
+        allTeams={allTeams}
+        myTeamIds={Array.from(myTeamIds)}
+        pendingTeamIds={Array.from(pendingTeamIds)}
+        activeTeamId={active.teamId}
+        dbUserId={dbUser.id}
+        handleJoin={handleJoin}
+        handleGoToTeam={handleGoToTeam}
+      />
     </div>
     </PageWrap>
   );

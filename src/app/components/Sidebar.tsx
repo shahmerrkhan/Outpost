@@ -77,7 +77,8 @@ export default function Sidebar() {
   if (!isLoaded || !isSignedIn) return null;
   if (pathname === "/onboarding") return null;
   if (pathname === "/") return null;
-  if (!ready) return null;
+  if (pathname === "/launch") return null;
+  if (pathname === "/teams") return null;
 
   return (
     <>
@@ -163,6 +164,19 @@ export default function Sidebar() {
               </Link>
             );
           })}
+          {teamId && (
+            <Link
+              href={`/teams/${teamId}/members`}
+              className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm relative overflow-hidden transition-all duration-200 ease-out ${
+                pathname === `/teams/${teamId}/members`
+                  ? "bg-[#1a1a24] text-white"
+                  : "text-gray-400 hover:text-white hover:bg-[#14141c] hover:translate-x-0.5"
+              }`}
+            >
+              <Users size={18} className="transition-transform duration-200 group-hover:scale-110" />
+              Members
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-[#1f1f28] flex items-center gap-3">

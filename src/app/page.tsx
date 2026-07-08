@@ -27,7 +27,7 @@ export default async function Home() {
         <div className="flex items-center gap-6 text-sm text-gray-400">
           {user ? (
             <Link
-              href="/dashboard"
+              href="/launch"
               className="bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-gray-200 transition"
             >
               Go to Dashboard
@@ -68,7 +68,7 @@ export default async function Home() {
         <div className="flex items-center gap-4">
           {user ? (
             <Link
-              href="/dashboard"
+              href="/launch"
               className="group bg-red-600 hover:bg-red-500 text-white font-semibold px-7 py-3.5 rounded-full flex items-center gap-2 transition shadow-[0_0_30px_rgba(220,38,38,0.35)]"
             >
               Go to Dashboard

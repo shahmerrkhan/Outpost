@@ -10,6 +10,7 @@ import { ArrowRight, Crown, Users } from "lucide-react";
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [name, setName] = useState("");
   const [school, setSchool] = useState("");
   const [path, setPath] = useState<"founder" | "member" | null>(null);
   const [teamName, setTeamName] = useState("");
@@ -19,7 +20,7 @@ export default function OnboardingPage() {
   async function handleStep1Next() {
     setLoading(true);
     try {
-      await saveProfileInfo(school);
+      await saveProfileInfo(name, school);
       setStep(2);
     } catch (e) {
       alert(toActionError(e).message);
@@ -71,6 +72,12 @@ export default function OnboardingPage() {
               <p className="text-gray-500 mb-8">Just a couple quick details.</p>
               <div className="space-y-4">
                 <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full name"
+                  className="w-full bg-white/5 border border-white/10 text-white placeholder-gray-600 p-4 rounded-xl focus:outline-none focus:border-red-500"
+                />
+                <input
                   value={school}
                   onChange={(e) => setSchool(e.target.value)}
                   placeholder="School / Organization"
@@ -79,7 +86,7 @@ export default function OnboardingPage() {
               </div>
               <button
                 onClick={handleStep1Next}
-                disabled={loading}
+                disabled={loading || !name.trim()}
                 className="mt-8 w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50"
               >
                 Continue <ArrowRight size={16} />
