@@ -53,10 +53,10 @@ export default function LogActivityModal({
         onClick={onClose}
       >
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          initial={{ opacity: 0, scale: 0.94, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ duration: 0.2 }}
+          exit={{ opacity: 0, scale: 0.96, y: 10 }}
+          transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
           onClick={(e) => e.stopPropagation()}
           className="bg-[#14141c] border border-[#26262f] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto"
         >
@@ -81,10 +81,10 @@ export default function LogActivityModal({
                     key={t.value}
                     type="button"
                     onClick={() => setType(t.value)}
-                    className={`text-left text-sm px-3 py-2.5 rounded-lg border transition ${
+                    className={`text-left text-sm px-3 py-2.5 rounded-lg border transition-all duration-200 ease-out active:scale-[0.97] ${
                       type === t.value
-                        ? "bg-yellow-400/10 border-yellow-400/40 text-yellow-400"
-                        : "bg-[#0a0a0f] border-[#26262f] text-gray-400 hover:border-gray-600"
+                        ? "bg-yellow-400/10 border-yellow-400/40 text-yellow-400 scale-[1.02]"
+                        : "bg-[#0a0a0f] border-[#26262f] text-gray-400 hover:border-gray-600 hover:bg-[#111117] hover:-translate-y-0.5"
                     }`}
                   >
                     {t.label}
@@ -101,7 +101,7 @@ export default function LogActivityModal({
                 <input
                   name="company"
                   placeholder="e.g. Microsoft, John Smith"
-                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200"
                 />
               </div>
               <div>
@@ -111,7 +111,7 @@ export default function LogActivityModal({
                 <input
                   name="contactEmail"
                   placeholder="contact@company.com"
-                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200"
                 />
               </div>
             </div>
@@ -124,7 +124,7 @@ export default function LogActivityModal({
                 name="notes"
                 placeholder="What happened? Any context..."
                 rows={3}
-                className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+                className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200"
               />
             </div>
 
@@ -136,7 +136,7 @@ export default function LogActivityModal({
                 <input
                   name="outcome"
                   placeholder="Result / next steps"
-                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200"
                 />
               </div>
               <div>
@@ -149,7 +149,7 @@ export default function LogActivityModal({
                   min="0"
                   max="600"
                   placeholder="30"
-                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+                  className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200 transition-colors duration-200"
                 />
               </div>
             </div>

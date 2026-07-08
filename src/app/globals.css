@@ -77,3 +77,18 @@ body {
 .cl-internal-b3fm6y {
   color: #ffffff !important;
 }
+.cl-card {
+  background-color: #0f0f0f !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-formFieldInput {
+  background-color: #050505 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.cl-socialButtonsBlockButton {
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}

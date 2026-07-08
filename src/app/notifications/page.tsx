@@ -49,7 +49,10 @@ export default function NotificationsPage() {
           </h2>
           <div className="space-y-3">
             {pendingRequests.map((req) => (
-              <div key={req.id} className="bg-[#14141c] border border-yellow-400/30 rounded-xl p-5 flex items-center justify-between">
+              <div
+                key={req.id}
+                className="bg-[#14141c] border border-yellow-400/30 rounded-xl p-5 flex items-center justify-between transition-all duration-200 hover:border-yellow-400/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-yellow-400/5"
+              >
                 <div className="flex items-center gap-3">
                   <UserPlus size={18} className="text-yellow-400" />
                   <span className="text-white">
@@ -80,7 +83,7 @@ export default function NotificationsPage() {
       ) : (
         <div className="space-y-2">
           {notifs.map((n) => (
-            <div key={n.id} className="bg-[#14141c] border border-[#26262f] rounded-xl p-4 text-sm flex justify-between">
+            <div key={n.id} className="bg-[#14141c] border border-[#26262f] rounded-xl p-4 text-sm flex justify-between transition-all duration-200 hover:border-[#33333f] hover:translate-x-0.5">
               <span className="text-gray-300">
                 {(() => {
                   let payload: any = {};

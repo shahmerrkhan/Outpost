@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { ArrowRight, Users, Radio, BarChart3, Sparkles, Shield, Zap } from "lucide-react";
+import { currentUser } from "@clerk/nextjs/server";
 import { getPublicTeams } from "@/app/actions/public";
 import JoinTeamButton from "@/app/components/JoinTeamButton";
 
 export default async function Home() {
   const user = await currentUser();
-  if (user) redirect("/dashboard");
-
   const teams = await getPublicTeams();
 
   return (
@@ -28,13 +25,24 @@ export default async function Home() {
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
         <span className="font-bold text-lg tracking-tight">Outpost</span>
         <div className="flex items-center gap-6 text-sm text-gray-400">
-          <Link href="/sign-in" className="hover:text-white transition">Sign In</Link>
-          <Link
-            href="/sign-up"
-            className="bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-gray-200 transition"
-          >
-            Get Started
-          </Link>
+          {user ? (
+            <Link
+              href="/dashboard"
+              className="bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-gray-200 transition"
+            >
+              Go to Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link href="/sign-in" className="hover:text-white transition">Sign In</Link>
+              <Link
+                href="/sign-up"
+                className="bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-gray-200 transition"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -58,19 +66,31 @@ export default async function Home() {
         </p>
 
         <div className="flex items-center gap-4">
-          <Link
-            href="/sign-up"
-            className="group bg-red-600 hover:bg-red-500 text-white font-semibold px-7 py-3.5 rounded-full flex items-center gap-2 transition shadow-[0_0_30px_rgba(220,38,38,0.35)]"
-          >
-            Get Started
-            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-          <Link
-            href="/sign-in"
-            className="border border-white/15 hover:border-white/30 px-7 py-3.5 rounded-full font-medium transition"
-          >
-            Sign In
-          </Link>
+          {user ? (
+            <Link
+              href="/dashboard"
+              className="group bg-red-600 hover:bg-red-500 text-white font-semibold px-7 py-3.5 rounded-full flex items-center gap-2 transition shadow-[0_0_30px_rgba(220,38,38,0.35)]"
+            >
+              Go to Dashboard
+              <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/sign-up"
+                className="group bg-red-600 hover:bg-red-500 text-white font-semibold px-7 py-3.5 rounded-full flex items-center gap-2 transition shadow-[0_0_30px_rgba(220,38,38,0.35)]"
+              >
+                Get Started
+                <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <Link
+                href="/sign-in"
+                className="border border-white/15 hover:border-white/30 px-7 py-3.5 rounded-full font-medium transition"
+              >
+                Sign In
+              </Link>
+            </>
+          )}
         </div>
       </section>
 
@@ -107,8 +127,7 @@ export default async function Home() {
               <div key={team.id} className="border border-white/10 bg-white/[0.02] rounded-2xl p-6 flex flex-col">
                 <h3 className="font-semibold mb-1">{team.name}</h3>
                 <p className="text-sm text-gray-500 mb-4 flex-1">{team.description || "No description yet."}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-600">{team.memberCount} member{team.memberCount !== 1 ? "s" : ""}</span>
+                <div className="flex items-center justify-end">
                   <JoinTeamButton teamId={team.id} />
                 </div>
               </div>
@@ -121,10 +140,10 @@ export default async function Home() {
         <h2 className="text-3xl font-bold mb-4">Ready to move?</h2>
         <p className="text-gray-500 mb-8">Join a team or start your own in under a minute.</p>
         <Link
-          href="/sign-up"
+          href={user ? "/dashboard" : "/sign-up"}
           className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-semibold px-7 py-3.5 rounded-full transition shadow-[0_0_30px_rgba(220,38,38,0.35)]"
         >
-          Get Started
+          {user ? "Go to Dashboard" : "Get Started"}
           <ArrowRight size={16} />
         </Link>
       </section>

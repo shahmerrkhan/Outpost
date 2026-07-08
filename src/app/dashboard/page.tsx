@@ -55,22 +55,22 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5">
+        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-yellow-400/30 hover:shadow-lg hover:shadow-black/30">
           <Mail size={18} className="text-yellow-400 mb-3" />
           <p className="text-2xl font-bold text-white">{emails}</p>
           <p className="text-xs text-gray-500">Emails Sent</p>
         </div>
-        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5">
+        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-blue-400/30 hover:shadow-lg hover:shadow-black/30">
           <Phone size={18} className="text-blue-400 mb-3" />
           <p className="text-2xl font-bold text-white">{calls}</p>
           <p className="text-xs text-gray-500">Calls Made</p>
         </div>
-        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5">
+        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-purple-400/30 hover:shadow-lg hover:shadow-black/30">
           <Calendar size={18} className="text-purple-400 mb-3" />
           <p className="text-2xl font-bold text-white">{meetings}</p>
           <p className="text-xs text-gray-500">Meetings</p>
         </div>
-        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5">
+        <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-orange-400/30 hover:shadow-lg hover:shadow-black/30">
           <Flame size={18} className="text-orange-400 mb-3" />
           <p className="text-2xl font-bold text-white">{myLogs.length}</p>
           <p className="text-xs text-gray-500">Total Activities</p>
@@ -92,8 +92,12 @@ export default async function Dashboard() {
           <div className="space-y-3">
             {recentLogs.map((log) => (
               <div key={log.id} className="flex items-center justify-between text-sm border-b border-[#26262f] pb-3 last:border-0">
-                <span className="text-gray-300 capitalize">{log.type} logged</span>
-                <span className="text-gray-500 text-xs">{log.createdAt.toLocaleString()}</span>
+                <div>
+                  <span className="text-gray-300 capitalize">{log.type.replace("_", " ")}</span>
+                  {log.company && <span className="text-gray-500"> · {log.company}</span>}
+                  {log.notes && <p className="text-xs text-gray-600 mt-0.5">{log.notes}</p>}
+                </div>
+                <span className="text-gray-500 text-xs whitespace-nowrap">{log.createdAt.toLocaleString()}</span>
               </div>
             ))}
           </div>

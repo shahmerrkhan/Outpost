@@ -76,6 +76,7 @@ export default function Sidebar() {
 
   if (!isLoaded || !isSignedIn) return null;
   if (pathname === "/onboarding") return null;
+  if (pathname === "/") return null;
   if (!ready) return null;
 
   return (
@@ -143,16 +144,19 @@ export default function Sidebar() {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition relative ${
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm relative overflow-hidden transition-all duration-200 ease-out ${
                   active
                     ? "bg-[#1a1a24] text-white"
-                    : "text-gray-400 hover:bg-[#14141c] hover:text-white"
+                    : "text-gray-400 hover:text-white hover:bg-[#14141c] hover:translate-x-0.5"
                 }`}
               >
-                <Icon size={18} />
+                {active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 bg-yellow-400 rounded-full" />
+                )}
+                <Icon size={18} className="transition-transform duration-200 group-hover:scale-110" />
                 {label}
                 {label === "Notifications" && count > 0 && (
-                  <span className="ml-auto bg-red-600 text-white text-xs rounded-full px-1.5">
+                  <span className="ml-auto bg-red-600 text-white text-xs rounded-full px-1.5 animate-pulse">
                     {count}
                   </span>
                 )}

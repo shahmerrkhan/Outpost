@@ -43,7 +43,7 @@ export default function CrmBoard({ contacts }: { contacts: Contact[] }) {
             </div>
             <div className={`space-y-2 border-t-2 ${col.color} pt-3`}>
               {items.map((c) => (
-                <div key={c.id} className="bg-[#14141c] border border-[#26262f] rounded-lg p-3">
+                <div key={c.id} className="bg-[#14141c] border border-[#26262f] rounded-lg p-3 transition-all duration-250 ease-out hover:-translate-y-0.5 hover:border-[#3a3a45] hover:shadow-md hover:shadow-black/30">
                   <p className="text-sm font-medium text-white">{c.name}</p>
                   <p className="text-xs text-gray-500 mb-2">{c.company}</p>
                   <CustomDropdown

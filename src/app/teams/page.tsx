@@ -48,7 +48,7 @@ export default async function TeamsPage() {
         </div>
       </div>
 
-      <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-6 mb-8">
+      <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-6 mb-8 transition-all duration-300 hover:border-[#33333f]">
         <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
           <Plus size={18} className="text-yellow-400" />
           {isFounder ? "Start another team" : "Tired of waiting? Start your own team"}
@@ -58,12 +58,12 @@ export default async function TeamsPage() {
             name="name"
             placeholder="Team name"
             required
-            className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+            className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200"
           />
           <textarea
             name="description"
             placeholder="What is this team about?"
-            className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400"
+            className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 w-full rounded-lg text-sm focus:outline-none focus:border-yellow-400 transition-colors duration-200"
           />
           <AnimatedButton type="submit" className="bg-yellow-400 text-black font-semibold px-5 py-2.5 rounded-lg text-sm">
             Create Team
@@ -74,7 +74,7 @@ export default async function TeamsPage() {
       <h2 className="text-white font-semibold mb-4">All Teams</h2>
       <div className="grid grid-cols-2 gap-4">
         {allTeams.map((team) => (
-          <div key={team.id} className={`bg-[#14141c] border rounded-xl p-5 ${team.id === active.teamId ? "border-yellow-400" : "border-[#26262f]"}`}>
+          <div key={team.id} className={`bg-[#14141c] border rounded-xl p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40 ${team.id === active.teamId ? "border-yellow-400" : "border-[#26262f] hover:border-[#3a3a45]"}`}>
             <div className="flex items-start justify-between mb-2">
               {myTeamIds.has(team.id) ? (
                 <form action={async () => {

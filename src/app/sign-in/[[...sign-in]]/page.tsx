@@ -1,4 +1,7 @@
+"use client";
+
 import { SignIn } from "@clerk/nextjs";
+import { motion } from "framer-motion";
 
 export default function Page() {
   return (
@@ -7,7 +10,12 @@ export default function Page() {
         className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none"
         style={{ background: "radial-gradient(circle, rgba(220,38,38,0.2), transparent 70%)" }}
       />
-      <div className="relative z-10">
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10"
+      >
         <SignIn
           appearance={{
             variables: {
@@ -38,7 +46,7 @@ export default function Page() {
             },
           }}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }
