@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getNotificationsData, respondToRequest } from "@/app/actions/teams";
 import { getUserTeamContext } from "@/app/actions/session-context";
+import { toActionError } from "@/app/lib/action-error";
 import AnimatedButton from "@/app/components/AnimatedButton";
 import PageWrap from "@/app/components/PageWrap";
 import { Bell, UserPlus } from "lucide-react";
@@ -26,8 +27,12 @@ export default function NotificationsPage() {
   }
 
   async function handleRespond(requestId: string, approve: boolean) {
-    await respondToRequest(requestId, approve);
-    load();
+    try {
+      await respondToRequest(requestId, approve);
+      load();
+    } catch (e) {
+      alert(toActionError(e).message);
+    }
   }
 
   if (loading) return null;

@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { db } from "@/../db";
 import { teams, teamMembers } from "@/../db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { ensureDbUser } from "@/app/actions/user";
 
 export async function getUserTeamContext() {
@@ -29,6 +29,19 @@ export async function getUserTeamContext() {
 }
 
 export async function setActiveContext(teamId: string, mode: "founder" | "member") {
+  const dbUser = await ensureDbUser();
+
+  const [membership] = await db
+    .select()
+    .from(teamMembers)
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, dbUser.id)));
+  if (!membership) throw new Error("Not a member of this team");
+
+  if (mode === "founder") {
+    const [team] = await db.select().from(teams).where(eq(teams.id, teamId));
+    if (!team || team.leaderId !== dbUser.id) throw new Error("Not the founder of this team");
+  }
+
   const cookieStore = await cookies();
   cookieStore.set("activeTeamId", teamId, { path: "/" });
   cookieStore.set("activeMode", mode, { path: "/" });

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { addCredential } from "@/app/actions/team-extras";
+import { toActionError } from "@/app/lib/action-error";
 import { KeyRound, Eye, EyeOff } from "lucide-react";
 
 export default function CredentialsCard({
@@ -24,9 +25,13 @@ export default function CredentialsCard({
   async function handleSave() {
     if (!label.trim() || !username.trim() || !password.trim()) return;
     setSaving(true);
-    await addCredential(teamId, label, site, username, password);
-    setSaving(false);
-    window.location.reload();
+    try {
+      await addCredential(teamId, label, site, username, password);
+      window.location.reload();
+    } catch (e) {
+      alert(toActionError(e).message);
+      setSaving(false);
+    }
   }
 
   return (

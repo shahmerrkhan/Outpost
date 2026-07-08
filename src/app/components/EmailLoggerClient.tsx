@@ -5,6 +5,7 @@ import PageWrap from "@/app/components/PageWrap";
 import AnimatedButton from "@/app/components/AnimatedButton";
 import { extractContacts } from "@/app/actions/ai-extract";
 import { getMyTeamId } from "@/app/actions/teams";
+import { toActionError } from "@/app/lib/action-error";
 import { useRouter } from "next/navigation";
 import { Sparkles, FileText, Zap, Layers } from "lucide-react";
 
@@ -23,10 +24,14 @@ export default function EmailLoggerClient() {
     if (!teamId || !text.trim()) return;
     setLoading(true);
     setResult(null);
-    const res = await extractContacts(teamId, text);
-    setResult(res);
+    try {
+      const res = await extractContacts(teamId, text);
+      setResult(res);
+      if (res.count > 0) setText("");
+    } catch (e) {
+      setResult({ count: 0, error: toActionError(e).message });
+    }
     setLoading(false);
-    if (res.count > 0) setText("");
   }
 
   return (

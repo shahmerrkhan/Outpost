@@ -5,11 +5,17 @@ import { teams, teamMembers, joinRequests, notifications, users } from "@/../db/
 import { eq, and, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { sendMail } from "@/app/lib/mail";
+import { checkRateLimit, standardRateLimit } from "@/app/lib/ratelimit";
 
 import { ensureDbUser } from "@/app/actions/user";
 
 export async function createTeam(name: string, description: string) {
   const dbUser = await ensureDbUser();
+  await checkRateLimit(standardRateLimit, dbUser.id);
+
+  if (!name || name.trim().length === 0 || name.length > 200) throw new Error("Invalid team name");
+  if (description && description.length > 2000) throw new Error("Description too long");
+
   const [team] = await db
     .insert(teams)
     .values({ orgId: dbUser.orgId!, leaderId: dbUser.id, name, description })
@@ -29,7 +35,23 @@ export async function createTeam(name: string, description: string) {
 
 export async function requestToJoin(teamId: string) {
   const dbUser = await ensureDbUser();
+  await checkRateLimit(standardRateLimit, dbUser.id);
+
   const [team] = await db.select().from(teams).where(eq(teams.id, teamId));
+  if (!team) throw new Error("Team not found");
+
+  const [existingMembership] = await db
+    .select()
+    .from(teamMembers)
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, dbUser.id)));
+  if (existingMembership) throw new Error("Already a member of this team");
+
+  const [existingRequest] = await db
+    .select()
+    .from(joinRequests)
+    .where(and(eq(joinRequests.teamId, teamId), eq(joinRequests.userId, dbUser.id), eq(joinRequests.status, "pending")));
+  if (existingRequest) throw new Error("Join request already pending");
+
   const [leader] = await db.select().from(users).where(eq(users.id, team.leaderId));
 
   await db.insert(joinRequests).values({
@@ -106,9 +128,14 @@ export async function getUnreadCount() {
 }
 
 export async function respondToRequest(requestId: string, approve: boolean) {
+  const dbUser = await ensureDbUser();
   const [request] = await db.select().from(joinRequests).where(eq(joinRequests.id, requestId));
+  if (!request) throw new Error("Request not found");
+  if (request.status !== "pending") throw new Error("Request already handled");
+
   const [requester] = await db.select().from(users).where(eq(users.id, request.userId));
   const [team] = await db.select().from(teams).where(eq(teams.id, request.teamId));
+  if (!team || team.leaderId !== dbUser.id) throw new Error("Not authorized");
 
   await db
     .update(joinRequests)

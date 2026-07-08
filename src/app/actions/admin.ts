@@ -21,6 +21,9 @@ async function assertFounder(teamId: string, userId: string) {
 }
 
 export async function getTeamMembers(teamId: string) {
+  const dbUser = await getDbUser();
+  await assertFounder(teamId, dbUser.id);
+
   return db
     .select({
       id: users.id,
@@ -54,6 +57,9 @@ export async function updateMemberRole(teamId: string, memberUserId: string, rol
 }
 
 export async function getTeamOversight(teamId: string) {
+  const dbUser = await getDbUser();
+  await assertFounder(teamId, dbUser.id);
+
   const members = await getTeamMembers(teamId);
   const logs = await db.select().from(outreachLogs).where(eq(outreachLogs.teamId, teamId));
 

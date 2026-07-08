@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveProfileInfo, completeAsFounder, completeAsMember } from "@/app/actions/onboarding";
+import { toActionError } from "@/app/lib/action-error";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Crown, Users } from "lucide-react";
 
@@ -17,22 +18,36 @@ export default function OnboardingPage() {
 
   async function handleStep1Next() {
     setLoading(true);
-    await saveProfileInfo(school);
+    try {
+      await saveProfileInfo(school);
+      setStep(2);
+    } catch (e) {
+      alert(toActionError(e).message);
+    }
     setLoading(false);
-    setStep(2);
   }
 
   async function handleFounderSubmit() {
     if (!teamName.trim()) return;
     setLoading(true);
-    await completeAsFounder(teamName, teamDesc);
-    router.push("/dashboard");
+    try {
+      await completeAsFounder(teamName, teamDesc);
+      router.push("/dashboard");
+    } catch (e) {
+      alert(toActionError(e).message);
+      setLoading(false);
+    }
   }
 
   async function handleMemberSubmit() {
     setLoading(true);
-    await completeAsMember();
-    router.push("/dashboard");
+    try {
+      await completeAsMember();
+      router.push("/dashboard");
+    } catch (e) {
+      alert(toActionError(e).message);
+      setLoading(false);
+    }
   }
 
   return (

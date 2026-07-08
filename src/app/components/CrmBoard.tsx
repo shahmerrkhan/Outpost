@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateContactStatus } from "@/app/actions/outreach";
+import { toActionError } from "@/app/lib/action-error";
 import CustomDropdown from "./CustomDropdown";
 
 const COLUMNS = [
@@ -23,12 +24,18 @@ type Contact = {
   contactType: string;
 };
 
-export default function CrmBoard({ contacts }: { contacts: Contact[] }) {
+export default function CrmBoard({ teamId, contacts }: { teamId: string; contacts: Contact[] }) {
   const [localContacts, setLocalContacts] = useState(contacts);
 
   async function moveCard(id: string, newStatus: string) {
+    const prevContacts = localContacts;
     setLocalContacts((prev) => prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c)));
-    await updateContactStatus(id, newStatus);
+    try {
+      await updateContactStatus(teamId, id, newStatus);
+    } catch (e) {
+      alert(toActionError(e).message);
+      setLocalContacts(prevContacts);
+    }
   }
 
   return (

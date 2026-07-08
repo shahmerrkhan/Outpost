@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { postAnnouncement, togglePin } from "@/app/actions/team-extras";
+import { postAnnouncement } from "@/app/actions/team-extras";
+import { toActionError } from "@/app/lib/action-error";
 import { Megaphone, Pin } from "lucide-react";
 
 export default function AnnouncementsCard({
@@ -21,10 +22,14 @@ export default function AnnouncementsCard({
   async function handlePost() {
     if (!text.trim()) return;
     setPosting(true);
-    await postAnnouncement(teamId, text, true);
-    setText("");
-    setPosting(false);
-    window.location.reload();
+    try {
+      await postAnnouncement(teamId, text, true);
+      setText("");
+      window.location.reload();
+    } catch (e) {
+      alert(toActionError(e).message);
+      setPosting(false);
+    }
   }
 
   return (

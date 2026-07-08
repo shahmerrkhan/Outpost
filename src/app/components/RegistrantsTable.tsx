@@ -8,6 +8,7 @@ import {
   deleteRegistrant,
   RegistrantStatus,
 } from "@/app/actions/registrants";
+import { toActionError } from "@/app/lib/action-error";
 import { Trash2, UserPlus } from "lucide-react";
 
 type Registrant = {
@@ -38,31 +39,49 @@ export default function RegistrantsTable({
   async function handleAdd() {
     if (!name.trim() || !email.trim()) return;
     setSaving(true);
-    await addRegistrant(teamId, name, email, school, grade);
-    setName("");
-    setEmail("");
-    setSchool("");
-    setGrade("");
-    setSaving(false);
-    setShowForm(false);
-    window.location.reload();
+    try {
+      await addRegistrant(teamId, name, email, school, grade);
+      setName("");
+      setEmail("");
+      setSchool("");
+      setGrade("");
+      setShowForm(false);
+      window.location.reload();
+    } catch (e) {
+      alert(toActionError(e).message);
+      setSaving(false);
+    }
   }
 
   async function handleStatusChange(id: string, status: RegistrantStatus) {
     setBusyId(id);
-    await updateRegistrantStatus(id, status);
-    window.location.reload();
+    try {
+      await updateRegistrantStatus(teamId, id, status);
+      window.location.reload();
+    } catch (e) {
+      alert(toActionError(e).message);
+      setBusyId(null);
+    }
   }
 
   async function handleNotesBlur(id: string, notes: string) {
-    await updateRegistrantNotes(id, notes);
+    try {
+      await updateRegistrantNotes(teamId, id, notes);
+    } catch (e) {
+      alert(toActionError(e).message);
+    }
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this registrant?")) return;
     setBusyId(id);
-    await deleteRegistrant(id);
-    window.location.reload();
+    try {
+      await deleteRegistrant(teamId, id);
+      window.location.reload();
+    } catch (e) {
+      alert(toActionError(e).message);
+      setBusyId(null);
+    }
   }
 
   return (

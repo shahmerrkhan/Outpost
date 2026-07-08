@@ -1,10 +1,35 @@
 "use server";
 
 import { db } from "@/../db";
-import { contacts } from "@/../db/schema";
+import { contacts, teamMembers, users } from "@/../db/schema";
+import { currentUser } from "@clerk/nextjs/server";
+import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { checkRateLimit, strictRateLimit } from "@/app/lib/ratelimit";
+
+async function getDbUser() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) throw new Error("Not signed in");
+  const [dbUser] = await db.select().from(users).where(eq(users.clerkId, clerkUser.id));
+  if (!dbUser) throw new Error("User not synced");
+  return dbUser;
+}
+
+async function assertTeamMember(teamId: string, userId: string) {
+  const [membership] = await db
+    .select()
+    .from(teamMembers)
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)));
+  if (!membership) throw new Error("Not authorized");
+}
 
 export async function extractContacts(teamId: string, rawText: string) {
+  const dbUser = await getDbUser();
+  await assertTeamMember(teamId, dbUser.id);
+  await checkRateLimit(strictRateLimit, dbUser.id);
+
+  if (!rawText || rawText.length > 20000) throw new Error("Text too long (max 20,000 characters)");
+
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {

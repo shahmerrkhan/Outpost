@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { logActivity } from "@/app/actions/outreach";
+import { toActionError } from "@/app/lib/action-error";
 
 const ACTIVITY_TYPES = [
   { value: "email", label: "Email Sent" },
@@ -30,17 +31,21 @@ export default function LogActivityModal({
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
-    await logActivity({
-      teamId,
-      type: type as any,
-      company: formData.get("company") as string,
-      contactEmail: formData.get("contactEmail") as string,
-      notes: formData.get("notes") as string,
-      outcome: formData.get("outcome") as string,
-      timeSpentMin: formData.get("timeSpentMin") as string,
-    });
-    setSubmitting(false);
-    onClose();
+    try {
+      await logActivity({
+        teamId,
+        type: type as any,
+        company: formData.get("company") as string,
+        contactEmail: formData.get("contactEmail") as string,
+        notes: formData.get("notes") as string,
+        outcome: formData.get("outcome") as string,
+        timeSpentMin: formData.get("timeSpentMin") as string,
+      });
+      onClose();
+    } catch (e) {
+      alert(toActionError(e).message);
+      setSubmitting(false);
+    }
   }
 
   return (

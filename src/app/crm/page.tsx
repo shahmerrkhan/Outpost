@@ -66,7 +66,7 @@ export default async function CrmPage() {
         </form>
       </details>
 
-      <CrmBoard contacts={teamContacts} />
+      <CrmBoard teamId={myTeamId} contacts={teamContacts} />
     </div>
     </PageWrap>
   );

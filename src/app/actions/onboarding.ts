@@ -5,14 +5,21 @@ import { users, teams, teamMembers } from "@/../db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { ensureDbUser } from "@/app/actions/user";
+import { checkRateLimit, standardRateLimit } from "@/app/lib/ratelimit";
 
 export async function saveProfileInfo(school: string) {
   const dbUser = await ensureDbUser();
+  if (school && school.length > 200) throw new Error("School name too long");
   await db.update(users).set({ school }).where(eq(users.id, dbUser.id));
 }
 
 export async function completeAsFounder(teamName: string, description: string) {
   const dbUser = await ensureDbUser();
+  await checkRateLimit(standardRateLimit, dbUser.id);
+
+  if (!teamName || teamName.trim().length === 0 || teamName.length > 200) throw new Error("Invalid team name");
+  if (description && description.length > 2000) throw new Error("Description too long");
+
   const [team] = await db
     .insert(teams)
     .values({ orgId: dbUser.orgId!, leaderId: dbUser.id, name: teamName, description })
