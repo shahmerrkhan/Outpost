@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { getUnreadCount, getMyTeamId, getOnboardedStatus } from "@/app/actions/teams";
-import { getUserTeamContext, getActiveContext } from "@/app/actions/session-context";
+import { getUserTeamContext, getActiveContext, getMyRoleInActiveTeam } from "@/app/actions/session-context";
 import Image from "next/image";
 import { LayoutDashboard, Users, Briefcase, Trophy, Bell, Plus, Radio, BarChart3, Sparkles, ClipboardList, Shield } from "lucide-react";
 import LogActivityModal from "./LogActivityModal";
@@ -36,6 +36,7 @@ export default function Sidebar() {
   const [founderTeams, setFounderTeams] = useState<any[]>([]);
   const [memberTeams, setMemberTeams] = useState<any[]>([]);
   const [activeMode, setActiveMode] = useState<"founder" | "member" | null>(null);
+  const [canAdmin, setCanAdmin] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [forceRole, setForceRole] = useState<"founder" | "member" | undefined>(undefined);
   const [modalOpen, setModalOpen] = useState(false);
@@ -71,6 +72,9 @@ export default function Sidebar() {
     getActiveContext().then((active) => {
       setActiveMode(active.mode);
     }).catch(() => {});
+    getMyRoleInActiveTeam().then((role) => {
+      setCanAdmin(role === "founder" || role === "lead");
+    }).catch(() => setCanAdmin(false));
     getOnboardedStatus().then((onboarded) => {
       setReady(true);
       if (!onboarded) setHasTeam(false);
@@ -188,7 +192,7 @@ export default function Sidebar() {
               Members
             </Link>
           )}
-          {activeMode === "founder" && (
+          {canAdmin && (
             <Link
               href="/dashboard/admin"
               className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm relative overflow-hidden transition-all duration-200 ease-out ${
@@ -227,6 +231,9 @@ export default function Sidebar() {
             getActiveContext().then((active) => {
               setActiveMode(active.mode);
             }).catch(() => {});
+            getMyRoleInActiveTeam().then((role) => {
+              setCanAdmin(role === "founder" || role === "lead");
+            }).catch(() => setCanAdmin(false));
           }}
         />
       )}

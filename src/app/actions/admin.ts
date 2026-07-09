@@ -16,8 +16,17 @@ async function getDbUser() {
 
 async function assertFounder(teamId: string, userId: string) {
   const [team] = await db.select().from(teams).where(eq(teams.id, teamId));
-  if (!team || team.leaderId !== userId) throw new Error("Not authorized");
-  return team;
+  if (!team) throw new Error("Team not found");
+  if (team.leaderId === userId) return team;
+
+  const [membership] = await db
+    .select()
+    .from(teamMembers)
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)));
+
+  if (membership?.role === "lead") return team;
+
+  throw new Error("Not authorized");
 }
 
 export async function getTeamMembers(teamId: string) {
@@ -39,7 +48,8 @@ export async function getTeamMembers(teamId: string) {
 
 export async function removeMember(teamId: string, memberUserId: string) {
   const dbUser = await getDbUser();
-  await assertFounder(teamId, dbUser.id);
+  const team = await assertFounder(teamId, dbUser.id);
+  if (memberUserId === team.leaderId) throw new Error("Cannot remove the team founder");
   await db
     .delete(teamMembers)
     .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, memberUserId)));
@@ -58,9 +68,9 @@ export async function updateMemberRole(teamId: string, memberUserId: string, rol
 
 export async function getTeamOversight(teamId: string) {
   const dbUser = await getDbUser();
-  await assertFounder(teamId, dbUser.id);
+  const team = await assertFounder(teamId, dbUser.id);
 
-  const members = await getTeamMembers(teamId);
+  const members = (await getTeamMembers(teamId)).filter((m) => m.id !== team.leaderId);
   const logs = await db.select().from(outreachLogs).where(eq(outreachLogs.teamId, teamId));
 
   const perMember = members.map((m) => {
@@ -107,4 +117,17 @@ export async function getMemberDetail(teamId: string, memberUserId: string) {
   const recentLogs = [...logs].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 20);
 
   return { member, logs, byType, byDay, recentLogs, totalLogs: logs.length };
+}
+
+export async function renameTeam(teamId: string, newName: string) {
+  const dbUser = await getDbUser();
+  await assertFounder(teamId, dbUser.id);
+
+  const trimmed = newName.trim();
+  if (!trimmed || trimmed.length > 100) throw new Error("Invalid team name");
+
+  await db.update(teams).set({ name: trimmed }).where(eq(teams.id, teamId));
+  revalidatePath("/dashboard/admin");
+  revalidatePath("/dashboard");
+  revalidatePath("/teams");
 }

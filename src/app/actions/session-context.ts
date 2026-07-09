@@ -53,3 +53,20 @@ export async function getActiveContext() {
   const mode = (cookieStore.get("activeMode")?.value as "founder" | "member") ?? null;
   return { teamId, mode };
 }
+
+export async function getMyRoleInActiveTeam() {
+  const dbUser = await ensureDbUser();
+  const cookieStore = await cookies();
+  const teamId = cookieStore.get("activeTeamId")?.value;
+  if (!teamId) return null;
+
+  const [team] = await db.select().from(teams).where(eq(teams.id, teamId));
+  if (team?.leaderId === dbUser.id) return "founder";
+
+  const [membership] = await db
+    .select()
+    .from(teamMembers)
+    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, dbUser.id)));
+
+  return membership?.role ?? null;
+}

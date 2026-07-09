@@ -5,6 +5,7 @@ import { users, teamMembers, teams } from "@/../db/schema";
 import { eq } from "drizzle-orm";
 import { getTeamOversight } from "@/app/actions/admin";
 import AdminMemberTable from "@/app/components/AdminMemberTable";
+import TeamRenameForm from "@/app/components/TeamRenameForm";
 
 export default async function AdminPage() {
   const clerkUser = await currentUser();
@@ -31,6 +32,8 @@ export default async function AdminPage() {
       <div className="max-w-5xl mx-auto">
         <h1 className="text-white text-2xl font-bold mb-1">Team Admin</h1>
         <p className="text-gray-500 text-sm mb-6">{team.name} · Founder view</p>
+
+        <TeamRenameForm teamId={team.id} currentName={team.name} />
 
         <AdminMemberTable teamId={team.id} members={oversight} />
       </div>
