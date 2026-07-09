@@ -82,14 +82,18 @@ export async function addContact(
   await assertTeamMember(teamId, dbUser.id);
   await checkRateLimit(standardRateLimit, dbUser.id);
 
-  const parsed = addContactSchema.parse({ name, email, company, phone, linkedin, title, notes });
-  name = parsed.name;
-  email = parsed.email ?? "";
-  company = parsed.company ?? "";
-  phone = parsed.phone ?? "";
-  linkedin = parsed.linkedin ?? "";
-  title = parsed.title ?? "";
-  notes = parsed.notes ?? "";
+  const result = addContactSchema.safeParse({ name, email, company, phone, linkedin, title, notes });
+  if (!result.success) {
+    const firstIssue = result.error.issues[0];
+    throw new Error(firstIssue.message);
+  }
+  name = result.data.name;
+  email = result.data.email ?? "";
+  company = result.data.company ?? "";
+  phone = result.data.phone ?? "";
+  linkedin = result.data.linkedin ?? "";
+  title = result.data.title ?? "";
+  notes = result.data.notes ?? "";
 
   const allTeamContacts = await db.select().from(contacts).where(eq(contacts.teamId, teamId));
   const normalizedName = name.trim().toLowerCase();
