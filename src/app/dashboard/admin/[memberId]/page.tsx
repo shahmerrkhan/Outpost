@@ -21,11 +21,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ m
   if (!membership) redirect("/dashboard");
 
   const [team] = await db.select().from(teams).where(eq(teams.id, membership.teamId));
-  if (!team) redirect("/dashboard");
-
-  const isFounder = team.leaderId === dbUser.id;
-  const isLead = membership.role === "lead";
-  if (!isFounder && !isLead) redirect("/dashboard");
+  if (!team || team.leaderId !== dbUser.id) redirect("/dashboard");
 
   const detail = await getMemberDetail(team.id, memberId);
 

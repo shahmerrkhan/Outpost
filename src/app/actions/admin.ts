@@ -16,17 +16,8 @@ async function getDbUser() {
 
 async function assertFounder(teamId: string, userId: string) {
   const [team] = await db.select().from(teams).where(eq(teams.id, teamId));
-  if (!team) throw new Error("Team not found");
-  if (team.leaderId === userId) return team;
-
-  const [membership] = await db
-    .select()
-    .from(teamMembers)
-    .where(and(eq(teamMembers.teamId, teamId), eq(teamMembers.userId, userId)));
-
-  if (membership?.role === "lead") return team;
-
-  throw new Error("Not authorized");
+  if (!team || team.leaderId !== userId) throw new Error("Not authorized");
+  return team;
 }
 
 export async function getTeamMembers(teamId: string) {

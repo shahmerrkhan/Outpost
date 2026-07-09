@@ -192,7 +192,7 @@ export default function Sidebar() {
               Members
             </Link>
           )}
-          {canAdmin && (
+          {activeMode === "founder" && (
             <Link
               href="/dashboard/admin"
               className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm relative overflow-hidden transition-all duration-200 ease-out ${

@@ -128,11 +128,9 @@ export default function AdminMemberTable({
               </td>
               <td className="p-3 text-gray-400">{m.email}</td>
               <td className="p-3">
-                <RoleDropdown
-                  value={m.role}
-                  disabled={busyId === m.id}
-                  onChange={(role) => handleRoleChange(m.id, role)}
-                />
+                <span className="text-xs text-gray-400 capitalize bg-[#0a0a0f] border border-[#26262f] rounded-lg px-3 py-1.5">
+                  {m.role}
+                </span>
               </td>
               <td className="p-3 text-gray-400">{m.totalLogs}</td>
               <td className="p-3 text-gray-400">
