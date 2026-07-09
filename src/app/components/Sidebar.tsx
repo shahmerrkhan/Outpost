@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { getUnreadCount, getMyTeamId, getOnboardedStatus } from "@/app/actions/teams";
 import { getUserTeamContext, getActiveContext } from "@/app/actions/session-context";
 import Image from "next/image";
-import { LayoutDashboard, Users, Briefcase, Trophy, Bell, Plus, Radio, BarChart3, Sparkles, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, Trophy, Bell, Plus, Radio, BarChart3, Sparkles, ClipboardList, Shield } from "lucide-react";
 import LogActivityModal from "./LogActivityModal";
 import TeamContextPicker from "./TeamContextPicker";
 import { useSidebarVisible } from "./SidebarContext";
@@ -186,6 +186,19 @@ export default function Sidebar() {
             >
               <Users size={18} className="transition-transform duration-200 group-hover:scale-110" />
               Members
+            </Link>
+          )}
+          {activeMode === "founder" && (
+            <Link
+              href="/dashboard/admin"
+              className={`group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm relative overflow-hidden transition-all duration-200 ease-out ${
+                pathname === "/dashboard/admin"
+                  ? "bg-[#1a1a24] text-white"
+                  : "text-gray-400 hover:text-white hover:bg-[#14141c] hover:translate-x-0.5"
+              }`}
+            >
+              <Shield size={18} className="transition-transform duration-200 group-hover:scale-110" />
+              Admin Panel
             </Link>
           )}
         </nav>
