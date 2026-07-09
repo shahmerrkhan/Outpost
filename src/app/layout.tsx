@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
 import SidebarSpacer from "./components/SidebarSpacer";
+import TopBar from "./components/TopBar";
 import { SidebarVisibleProvider } from "./components/SidebarContext";
 
 
@@ -33,6 +34,7 @@ export default function RootLayout({
         <body>
           <SidebarVisibleProvider>
             <Sidebar />
+            <TopBar />
             <SidebarSpacer>{children}</SidebarSpacer>
           </SidebarVisibleProvider>
         </body>

@@ -76,3 +76,35 @@ export async function getTeamOversight(teamId: string) {
 
   return perMember;
 }
+
+export async function getMemberDetail(teamId: string, memberUserId: string) {
+  const dbUser = await getDbUser();
+  await assertFounder(teamId, dbUser.id);
+
+  const [member] = await db
+    .select({ id: users.id, name: users.name, email: users.email, school: users.school })
+    .from(users)
+    .where(eq(users.id, memberUserId));
+
+  if (!member) throw new Error("Member not found");
+
+  const logs = await db
+    .select()
+    .from(outreachLogs)
+    .where(and(eq(outreachLogs.teamId, teamId), eq(outreachLogs.userId, memberUserId)));
+
+  const byType: Record<string, number> = {};
+  for (const l of logs) {
+    byType[l.type] = (byType[l.type] ?? 0) + 1;
+  }
+
+  const byDay: Record<string, number> = {};
+  for (const l of logs) {
+    const day = l.createdAt.toISOString().slice(0, 10);
+    byDay[day] = (byDay[day] ?? 0) + 1;
+  }
+
+  const recentLogs = [...logs].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 20);
+
+  return { member, logs, byType, byDay, recentLogs, totalLogs: logs.length };
+}
