@@ -12,6 +12,10 @@ const addContactSchema = z.object({
   name: z.string().trim().min(1).max(200).regex(/^[a-zA-Z\s.'-]+$/, "Name cannot contain numbers or symbols"),
   email: z.string().trim().max(200).email("Must be a valid email").optional().or(z.literal("")),
   company: z.string().trim().max(200).optional().or(z.literal("")),
+  phone: z.string().trim().max(30).optional().or(z.literal("")),
+  linkedin: z.string().trim().max(300).optional().or(z.literal("")),
+  title: z.string().trim().max(150).optional().or(z.literal("")),
+  notes: z.string().trim().max(2000).optional().or(z.literal("")),
 });
 
 const logActivitySchema = z.object({
@@ -64,15 +68,28 @@ export async function updateContactStatus(teamId: string, contactId: string, sta
   revalidatePath("/crm");
 }
 
-export async function addContact(teamId: string, name: string, email: string, company: string) {
+export async function addContact(
+  teamId: string,
+  name: string,
+  email: string,
+  company: string,
+  phone: string = "",
+  linkedin: string = "",
+  title: string = "",
+  notes: string = ""
+) {
   const dbUser = await getDbUser();
   await assertTeamMember(teamId, dbUser.id);
   await checkRateLimit(standardRateLimit, dbUser.id);
 
-  const parsed = addContactSchema.parse({ name, email, company });
+  const parsed = addContactSchema.parse({ name, email, company, phone, linkedin, title, notes });
   name = parsed.name;
   email = parsed.email ?? "";
   company = parsed.company ?? "";
+  phone = parsed.phone ?? "";
+  linkedin = parsed.linkedin ?? "";
+  title = parsed.title ?? "";
+  notes = parsed.notes ?? "";
 
   const allTeamContacts = await db.select().from(contacts).where(eq(contacts.teamId, teamId));
   const normalizedName = name.trim().toLowerCase();
@@ -84,7 +101,16 @@ export async function addContact(teamId: string, name: string, email: string, co
 
   const [contact] = await db
     .insert(contacts)
-    .values({ teamId, name, email, company })
+    .values({
+      teamId,
+      name,
+      email: email || null,
+      company: company || null,
+      phone: phone || null,
+      linkedin: linkedin || null,
+      title: title || null,
+      notes: notes || null,
+    })
     .returning();
   revalidatePath("/crm");
   return contact;
@@ -141,4 +167,35 @@ export async function logActivity(data: {
   revalidatePath("/dashboard");
   revalidatePath("/leaderboard");
   revalidatePath("/live-feed");
+}
+
+const updateContactDetailsSchema = z.object({
+  phone: z.string().trim().max(30).optional().or(z.literal("")),
+  linkedin: z.string().trim().max(300).optional().or(z.literal("")),
+  title: z.string().trim().max(150).optional().or(z.literal("")),
+  notes: z.string().trim().max(2000).optional().or(z.literal("")),
+});
+
+export async function updateContactDetails(
+  teamId: string,
+  contactId: string,
+  phone: string,
+  linkedin: string,
+  title: string,
+  notes: string
+) {
+  const dbUser = await getDbUser();
+  await assertTeamMember(teamId, dbUser.id);
+
+  const parsed = updateContactDetailsSchema.parse({ phone, linkedin, title, notes });
+
+  await db
+    .update(contacts)
+    .set({
+      phone: parsed.phone || null,
+      linkedin: parsed.linkedin || null,
+      title: parsed.title || null,
+      notes: parsed.notes || null,
+    })
+    .where(and(eq(contacts.id, contactId), eq(contacts.teamId, teamId)));
 }

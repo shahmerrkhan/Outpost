@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { getUnreadCount, getMyTeamId, getOnboardedStatus } from "@/app/actions/teams";
 import { getUserTeamContext, getActiveContext } from "@/app/actions/session-context";
 import Image from "next/image";
-import { LayoutDashboard, Users, Briefcase, Trophy, Bell, Plus, Radio, BarChart3, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, Trophy, Bell, Plus, Radio, BarChart3, Sparkles, ClipboardList } from "lucide-react";
 import LogActivityModal from "./LogActivityModal";
 import TeamContextPicker from "./TeamContextPicker";
 import { useSidebarVisible } from "./SidebarContext";
@@ -19,6 +19,7 @@ const links = [
   { href: "/live-feed", label: "Live Feed", icon: Radio },
   { href: "/teams", label: "Teams", icon: Users },
   { href: "/crm", label: "CRM", icon: Briefcase },
+  { href: "/tasks", label: "Tasks", icon: ClipboardList },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/email-logger", label: "AI Email Logger", icon: Sparkles },

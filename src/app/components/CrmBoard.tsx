@@ -12,7 +12,7 @@ import {
   DragStartEvent,
   DragEndEvent,
 } from "@dnd-kit/core";
-import { updateContactStatus } from "@/app/actions/outreach";
+import { updateContactStatus, updateContactDetails } from "@/app/actions/outreach";
 import { toActionError } from "@/app/lib/action-error";
 
 const COLUMNS = [
@@ -30,11 +30,15 @@ type Contact = {
   name: string;
   email: string | null;
   company: string | null;
+  phone: string | null;
+  linkedin: string | null;
+  title: string | null;
+  notes: string | null;
   status: string;
   contactType: string;
 };
 
-function DraggableCard({ contact }: { contact: Contact }) {
+function DraggableCard({ contact, onOpen }: { contact: Contact; onOpen: (c: Contact) => void }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: contact.id });
   const style = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, opacity: isDragging ? 0.4 : 1 }
@@ -45,15 +49,16 @@ function DraggableCard({ contact }: { contact: Contact }) {
       style={style}
       {...listeners}
       {...attributes}
+      onClick={() => onOpen(contact)}
       className="bg-[#14141c] border border-[#26262f] rounded-lg p-3 cursor-grab active:cursor-grabbing hover:border-[#3a3a45] touch-none"
     >
       <p className="text-sm font-medium text-white">{contact.name}</p>
-      <p className="text-xs text-gray-500">{contact.company}</p>
+      <p className="text-xs text-gray-500">{contact.title ? `${contact.title} · ` : ""}{contact.company}</p>
     </div>
   );
 }
 
-function DroppableColumn({ col, items }: { col: (typeof COLUMNS)[number]; items: Contact[] }) {
+function DroppableColumn({ col, items, onOpen }: { col: (typeof COLUMNS)[number]; items: Contact[]; onOpen: (c: Contact) => void }) {
   const { setNodeRef, isOver } = useDroppable({ id: col.key });
   return (
     <div className="min-w-[260px] flex-shrink-0">
@@ -68,7 +73,7 @@ function DroppableColumn({ col, items }: { col: (typeof COLUMNS)[number]; items:
         }`}
       >
         {items.map((c) => (
-          <DraggableCard key={c.id} contact={c} />
+          <DraggableCard key={c.id} contact={c} onOpen={onOpen} />
         ))}
         {items.length === 0 && (
           <div className="border border-dashed border-[#26262f] rounded-lg p-4 text-center text-xs text-gray-600">
@@ -83,6 +88,7 @@ function DroppableColumn({ col, items }: { col: (typeof COLUMNS)[number]; items:
 export default function CrmBoard({ teamId, contacts }: { teamId: string; contacts: Contact[] }) {
   const [localContacts, setLocalContacts] = useState(contacts);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [openContact, setOpenContact] = useState<Contact | null>(null);
 
   useEffect(() => {
     setLocalContacts(contacts);
@@ -118,7 +124,7 @@ export default function CrmBoard({ teamId, contacts }: { teamId: string; contact
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-4">
         {COLUMNS.map((col) => (
-          <DroppableColumn key={col.key} col={col} items={localContacts.filter((c) => c.status === col.key)} />
+          <DroppableColumn key={col.key} col={col} items={localContacts.filter((c) => c.status === col.key)} onOpen={setOpenContact} />
         ))}
       </div>
       <DragOverlay>
@@ -129,6 +135,67 @@ export default function CrmBoard({ teamId, contacts }: { teamId: string; contact
           </div>
         ) : null}
       </DragOverlay>
+      {openContact && (
+        <ContactDetailModal
+          teamId={teamId}
+          contact={openContact}
+          onClose={() => setOpenContact(null)}
+          onSaved={(updated) => {
+            setLocalContacts((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+            setOpenContact(null);
+          }}
+        />
+      )}
     </DndContext>
+  );
+}
+
+function ContactDetailModal({
+  teamId,
+  contact,
+  onClose,
+  onSaved,
+}: {
+  teamId: string;
+  contact: Contact;
+  onClose: () => void;
+  onSaved: (c: Contact) => void;
+}) {
+  const [phone, setPhone] = useState(contact.phone ?? "");
+  const [linkedin, setLinkedin] = useState(contact.linkedin ?? "");
+  const [title, setTitle] = useState(contact.title ?? "");
+  const [notes, setNotes] = useState(contact.notes ?? "");
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await updateContactDetails(teamId, contact.id, phone, linkedin, title, notes);
+      onSaved({ ...contact, phone, linkedin, title, notes });
+    } catch (err) {
+      alert(toActionError(err).message);
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6" onClick={onClose}>
+      <div className="bg-[#14141c] border border-[#26262f] rounded-xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-white font-semibold mb-1">{contact.name}</h3>
+        <p className="text-xs text-gray-500 mb-4">{contact.email || "No email"} {contact.company ? `· ${contact.company}` : ""}</p>
+        <div className="space-y-3">
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Job title" className="w-full bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className="w-full bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="LinkedIn URL" className="w-full bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" rows={4} className="w-full bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button onClick={onClose} className="flex-1 border border-[#26262f] text-gray-300 py-2.5 rounded-lg text-sm">Close</button>
+          <button onClick={handleSave} disabled={saving} className="flex-1 bg-yellow-400 text-black font-semibold py-2.5 rounded-lg text-sm disabled:opacity-50">
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -71,6 +71,10 @@ export const contacts = pgTable("contacts", {
   name: text("name").notNull(),
   email: text("email"),
   company: text("company"),
+  phone: text("phone"),
+  linkedin: text("linkedin"),
+  title: text("title"),
+  notes: text("notes"),
   status: text("status").default("lead").notNull(),
   contactType: contactTypeEnum("contact_type").default("sponsor").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -106,6 +110,22 @@ export const outreachLogs = pgTable("outreach_logs", {
   notes: text("notes"),
   outcome: text("outcome"),
   timeSpentMin: text("time_spent_min"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const taskStatusEnum = pgEnum("task_status", ["open", "in_progress", "done"]);
+export const taskPriorityEnum = pgEnum("task_priority", ["low", "medium", "high"]);
+
+export const tasks = pgTable("tasks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  teamId: uuid("team_id").references(() => teams.id).notNull(),
+  assigneeId: uuid("assignee_id").references(() => users.id),
+  authorId: uuid("author_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: taskStatusEnum("status").default("open").notNull(),
+  priority: taskPriorityEnum("priority").default("medium").notNull(),
+  dueDate: timestamp("due_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

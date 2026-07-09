@@ -11,6 +11,10 @@ type Contact = {
   name: string;
   email: string | null;
   company: string | null;
+  phone: string | null;
+  linkedin: string | null;
+  title: string | null;
+  notes: string | null;
   status: string;
   contactType: string;
 };
@@ -20,6 +24,10 @@ export default function CrmPageClient({ teamId, initialContacts }: { teamId: str
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
+  const [linkedin, setLinkedin] = useState("");
+  const [title, setTitle] = useState("");
+  const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function handleAdd(e: React.FormEvent) {
@@ -27,11 +35,15 @@ export default function CrmPageClient({ teamId, initialContacts }: { teamId: str
     if (!name.trim()) return;
     setSubmitting(true);
     try {
-      const contact = await addContact(teamId, name, email, company);
+      const contact = await addContact(teamId, name, email, company, phone, linkedin, title, notes);
       setContacts((prev) => [...prev, contact as Contact]);
       setName("");
       setEmail("");
       setCompany("");
+      setPhone("");
+      setLinkedin("");
+      setTitle("");
+      setNotes("");
     } catch (err) {
       alert(toActionError(err).message);
     }
@@ -56,6 +68,10 @@ export default function CrmPageClient({ teamId, initialContacts }: { teamId: str
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
           <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company" className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Job Title" className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone" className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="LinkedIn URL" className="bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" className="col-span-3 bg-[#0a0a0f] border border-[#26262f] text-white placeholder-gray-600 p-3 rounded-lg text-sm focus:outline-none focus:border-yellow-400" />
           <button type="submit" disabled={submitting} className="col-span-3 bg-yellow-400 text-black font-semibold px-5 py-2.5 rounded-lg text-sm disabled:opacity-50">
             {submitting ? "Adding..." : "Add Contact"}
           </button>
